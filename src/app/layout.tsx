@@ -6,7 +6,7 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Nhà thờ",
+  title: "Giáo Sứ Tân Trang",
   description: "",
 };
 
