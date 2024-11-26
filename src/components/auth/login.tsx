@@ -1,14 +1,27 @@
 "use client";
-import { Button, Col, Divider, Form, Input, Row } from "antd";
+import { Button, Col, Divider, Form, Input, notification, Row } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { authenticate } from "@/utils/actions";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
+  const router = useRouter();
   const onFinish = async (values: any) => {
     const { email, password } = values;
     //trigger login
     const res = await authenticate(email, password);
+    if (res?.error) {
+      notification.error({
+        message: "Lỗi đăng nhập",
+        description: res?.error,
+      });
+      if (res?.code === 2) {
+        router.push("/verify");
+      }
+    } else {
+      router.push("/dashboard");
+    }
   };
 
   return (
