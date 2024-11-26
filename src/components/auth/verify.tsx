@@ -59,7 +59,7 @@ const Verify = (props: any) => {
             autoComplete="off"
             layout="vertical"
           >
-            <Form.Item label="Id" name="_id" initialValue={id}>
+            <Form.Item label="Id" name="_id" initialValue={id} hidden>
               <Input disabled />
             </Form.Item>
             <div>
