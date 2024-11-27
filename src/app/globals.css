@@ -18,16 +18,17 @@ a {
   text-decoration: none;
 }
 
-li, a, button {
-    font-family: "Montserrat", sans-serif;
-    font-weight: bolder;
-    color: #000;
-    text-decoration: none;
+li,
+a,
+button {
+  font-family: "Montserrat", sans-serif;
+  font-weight: bolder;
+  color: #000;
+  text-decoration: none;
 }
 
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
   }
-}
 }
