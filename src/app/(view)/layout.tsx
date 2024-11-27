@@ -1,26 +1,21 @@
-import type { Metadata } from "next";
+// src/app/(view)/layout.tsx
+import { ReactNode } from "react";
 import { Inter } from "next/font/google";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import Link from "next/link";
-import Image from "next/image";
-import Script from "next/script";
-import styles from "./styles/index.module.css";
-
-import "@/app/globals.css";
 import NextAuthWrapper from "@/library/next.auth.wrapper";
+import Link from "next/link";
+import Script from "next/script";
+import styles from "@/app/(view)/styles/index.module.css";
+import "@/app/(view)/style.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Giáo Xứ Tân Trang",
   description: "",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function ViewLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className={inter.className}>
@@ -65,9 +60,11 @@ export default function RootLayout({
           </nav>
         </header>
         {/* End of header */}
+
         <AntdRegistry>
           <NextAuthWrapper>{children}</NextAuthWrapper>
         </AntdRegistry>
+
         {/* Footer */}
         <footer className={styles.footer}>
           <div className={styles.footer__container}>
@@ -123,15 +120,13 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
-        {/* End of footer */}
 
-        {/* JAVASCRIPT */}
+        {/* Scripts */}
         <Script
           src="https://kit.fontawesome.com/52df58e152.js"
           crossOrigin="anonymous"
         ></Script>
         <Script src="/js/basic.js" async defer></Script>
-        {/* End of JAVASCRIPT */}
       </body>
     </html>
   );
