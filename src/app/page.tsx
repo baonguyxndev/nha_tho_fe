@@ -10,9 +10,6 @@ export default async function Home() {
   const session = await auth();
   console.log(">>> session000: ", session);
   return (
-    <main>
-      <h1>Main content</h1>
-    </main>
     <div>
       <HomePage />
     </div>
