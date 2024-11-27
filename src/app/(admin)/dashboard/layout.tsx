@@ -5,7 +5,7 @@ import AdminHeader from "@/components/layout/admin.header";
 import AdminSideBar from "@/components/layout/admin.sidebar";
 import { AdminContextProvider } from "@/library/admin.context";
 
-const AdminLayout = async ({
+const DashboardLayout = async ({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -28,4 +28,4 @@ const AdminLayout = async ({
   );
 };
 
-export default AdminLayout;
+export default DashboardLayout;
