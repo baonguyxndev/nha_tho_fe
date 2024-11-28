@@ -132,7 +132,7 @@ export default function RootLayout({
 
         {/* JAVASCRIPT */}
         <Script src="https://kit.fontawesome.com/52df58e152.js" crossOrigin="anonymous"></Script>
-        <Script src="/js/basic.js" async defer></Script>
+        {/* <Script src="/js/basic.js" async defer></Script> */}
         {/* End of JAVASCRIPT */}
         <AntdRegistry>
           <NextAuthWrapper>{children}</NextAuthWrapper>
