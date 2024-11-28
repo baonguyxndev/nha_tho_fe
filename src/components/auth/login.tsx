@@ -2,11 +2,11 @@
 import { Button, Col, Divider, Form, Input, notification, Row } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import Link from "next/link";
-import { authenticate } from "@/utils/actions";
 import { useRouter } from "next/navigation";
 import ModalReactive from "./modal.re-active";
 import { useState } from "react";
 import ModalChangePassword from "./modal.change.password";
+import { authenticate } from "@/utils/actions/user.action";
 
 const Login = () => {
   const router = useRouter();
