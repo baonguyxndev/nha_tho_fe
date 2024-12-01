@@ -2,8 +2,13 @@
 import Layout from "antd/es/layout";
 import Menu from "antd/es/menu";
 import {
+  AimOutlined,
   AppstoreOutlined,
+  CodeOutlined,
+  DownOutlined,
   MailOutlined,
+  ManOutlined,
+  MenuOutlined,
   SettingOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
@@ -30,37 +35,35 @@ const AdminSideBar = () => {
         },
         {
           key: "users",
-          label: <Link href={"/dashboard/user"}>Manage Users</Link>,
+          label: <Link href={"/dashboard/user"}>Nhân sự</Link>,
           icon: <TeamOutlined />,
         },
         {
           key: "sub4",
-          label: "Managerment",
-          icon: <SettingOutlined />,
+          label: "Quản lý",
+          icon: <MenuOutlined />,
           children: [
             {
               key: "1",
-              label: <Link href={"/dashboard/categories"}>Categories</Link>,
+              label: <Link href={"/dashboard/categories"}>Danh mục</Link>,
             },
-            { key: "2", label: <Link href={"/dashboard/books"}>Books</Link> },
-            { key: "3", label: <Link href={"/dashboard/news"}>News</Link> },
+            { key: "2", label: <Link href={"/dashboard/books"}>Sách</Link> },
+            { key: "3", label: <Link href={"/dashboard/news"}>Tin</Link> },
             {
               key: "4",
               label: (
-                <Link href={"/dashboard/bible-versions"}>Bible Versions</Link>
+                <Link href={"/dashboard/bible-versions"}>Bản kinh thánh</Link>
               ),
             },
             {
               key: "5",
-              label: (
-                <Link href={"/dashboard/ministry-years"}>Ministry Years</Link>
-              ),
+              label: <Link href={"/dashboard/ministry-years"}>Năm mục vụ</Link>,
             },
             {
               key: "6",
-              label: <Link href={"/dashboard/chapters"}>Chapters</Link>,
+              label: <Link href={"/dashboard/chapters"}>Chương</Link>,
             },
-            { key: "7", label: <Link href={"/dashboard/verses"}>Verses</Link> },
+            { key: "7", label: <Link href={"/dashboard/verses"}>Đoạn</Link> },
           ],
         },
       ],

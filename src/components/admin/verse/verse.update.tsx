@@ -1,4 +1,4 @@
-import { handleUpdateBookAction } from "@/utils/actions/book.action";
+import { handleUpdateVerseAction } from "@/utils/actions/verse.action";
 import {
   Modal,
   Input,
@@ -10,7 +10,8 @@ import {
   Select,
 } from "antd";
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSession } from "next-auth/react"; // Nếu sử dụng next-auth để quản lý session
+const { TextArea } = Input;
 
 interface IProps {
   isUpdateModalOpen: boolean;
@@ -19,32 +20,24 @@ interface IProps {
   setDataUpdate: any;
 }
 
-const BookUpdate = (props: IProps) => {
+const VerseUpdate = (props: IProps) => {
   const { isUpdateModalOpen, setIsUpdateModalOpen, dataUpdate, setDataUpdate } =
     props;
 
   const [form] = Form.useForm();
   const { data: session } = useSession();
-  const [bibleVersions, setBibleVersions] = useState<any[]>([]);
+  const [chapters, setChapters] = useState<any[]>([]);
 
   useEffect(() => {
-    if (dataUpdate) {
-      form.setFieldsValue({
-        name: dataUpdate.name,
-        bibleVersionId: dataUpdate.bibleVersionId,
-      });
-    }
-  }, [dataUpdate]);
-
-  useEffect(() => {
-    const fetchBibleVersions = async () => {
+    // Nạp danh sách chương
+    const fetchChapters = async () => {
       if (!session?.user?.accessToken) {
         return;
       }
 
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bible-versions`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chapters`,
           {
             method: "GET",
             headers: {
@@ -54,17 +47,27 @@ const BookUpdate = (props: IProps) => {
         );
         const data = await response.json();
         if (data?.data?.results) {
-          setBibleVersions(data.data.results);
+          setChapters(data.data.results);
         } else {
-          message.error("Không thể lấy danh sách Bible Versions");
+          message.error("Không thể lấy danh sách chương");
         }
       } catch (error: any) {
-        message.error("Có lỗi xảy ra khi lấy danh sách Bible Versions");
+        message.error("Có lỗi xảy ra khi lấy danh sách chương");
       }
     };
 
-    fetchBibleVersions();
+    fetchChapters();
   }, [session]);
+
+  useEffect(() => {
+    if (dataUpdate) {
+      form.setFieldsValue({
+        number: dataUpdate.number,
+        desc: dataUpdate.desc,
+        chapterId: dataUpdate.chapterId,
+      });
+    }
+  }, [dataUpdate]);
 
   const handleCloseUpdateModal = () => {
     form.resetFields();
@@ -74,18 +77,19 @@ const BookUpdate = (props: IProps) => {
 
   const onFinish = async (values: any) => {
     if (dataUpdate) {
-      const { name, bibleVersionId } = values;
-      const res = await handleUpdateBookAction({
+      const { number, desc, chapterId } = values;
+      const res = await handleUpdateVerseAction({
         _id: dataUpdate._id,
-        name,
-        bibleVersionId,
+        number,
+        desc,
+        chapterId,
       });
       if (res?.data) {
         handleCloseUpdateModal();
-        message.success("Cập nhập thành công");
+        message.success("Sửa đoạn thành công");
       } else {
         notification.error({
-          message: "Cập nhập lỗi",
+          message: "Lỗi sửa đoạn",
           description: res?.message,
         });
       }
@@ -94,7 +98,7 @@ const BookUpdate = (props: IProps) => {
 
   return (
     <Modal
-      title="Update a book"
+      title="Sửa đoạn"
       open={isUpdateModalOpen}
       onOk={() => form.submit()}
       onCancel={handleCloseUpdateModal}
@@ -104,9 +108,9 @@ const BookUpdate = (props: IProps) => {
         <Row gutter={[15, 15]}>
           <Col span={24}>
             <Form.Item
-              label="Tên sách"
-              name="name"
-              rules={[{ required: true, message: "Vui lòng nhập tên sách!" }]}
+              label="Đoạn số"
+              name="number"
+              rules={[{ required: true, message: "Vui lòng nhập số đoạn" }]}
             >
               <Input />
             </Form.Item>
@@ -114,22 +118,27 @@ const BookUpdate = (props: IProps) => {
 
           <Col span={24}>
             <Form.Item
-              label="Phiên bản Kinh Thánh"
-              name="bibleVersionId"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng chọn phiên bản Kinh Thánh",
-                },
-              ]}
+              label="Chương"
+              name="chapterId"
+              rules={[{ required: true, message: "Vui lòng chọn chương" }]}
             >
-              <Select placeholder="Chọn phiên bản Kinh Thánh">
-                {bibleVersions.map((version) => (
-                  <Select.Option key={version._id} value={version._id}>
-                    {version.name}
+              <Select placeholder="Chọn Chương">
+                {chapters.map((chapter) => (
+                  <Select.Option key={chapter._id} value={chapter._id}>
+                    {chapter.number}
                   </Select.Option>
                 ))}
               </Select>
+            </Form.Item>
+          </Col>
+
+          <Col span={24}>
+            <Form.Item
+              label="Mô tả"
+              name="desc"
+              rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
+            >
+              <TextArea rows={4} />
             </Form.Item>
           </Col>
         </Row>
@@ -138,4 +147,4 @@ const BookUpdate = (props: IProps) => {
   );
 };
 
-export default BookUpdate;
+export default VerseUpdate;

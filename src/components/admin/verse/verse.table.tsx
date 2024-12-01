@@ -5,11 +5,12 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { handleDeleteCategoryAction } from "@/utils/actions/categoty.action";
-import CategoryCreate from "./category.create";
-import CategoryUpdate from "./category.update";
+import { SessionProvider } from "next-auth/react";
+import VerseCreate from "./verse.create";
+import VerseUpdate from "./verse.update";
 
 interface IProps {
-  categories: any;
+  verse: any;
   meta: {
     current: number;
     pageSize: number;
@@ -18,8 +19,8 @@ interface IProps {
   };
 }
 
-const CategoryTable = (props: IProps) => {
-  const { categories, meta } = props;
+const VerseTable = (props: IProps) => {
+  const { verse, meta } = props;
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -31,7 +32,7 @@ const CategoryTable = (props: IProps) => {
 
   useEffect(() => {
     setLoading(false);
-  }, [categories]);
+  }, [verse]);
 
   const columns = [
     {
@@ -41,8 +42,16 @@ const CategoryTable = (props: IProps) => {
       },
     },
     {
-      title: "Tên danh mục",
-      dataIndex: "name",
+      title: "Đoạn số",
+      dataIndex: "number",
+    },
+    {
+      title: "Mô tả",
+      dataIndex: "desc",
+    },
+    {
+      title: "Chương",
+      dataIndex: "chapterId",
     },
     {
       title: "Tạo lúc",
@@ -71,8 +80,8 @@ const CategoryTable = (props: IProps) => {
             />
             <Popconfirm
               placement="leftTop"
-              title={"Xác nhận xóa danh mục"}
-              description={"Bạn có chắc chắn muốn xóa danh mục này ?"}
+              title={"Xác nhận xóa sách"}
+              description={"Bạn có chắc chắn muốn xóa sách này ?"}
               onConfirm={async () =>
                 await handleDeleteCategoryAction(record?._id)
               }
@@ -107,12 +116,12 @@ const CategoryTable = (props: IProps) => {
           marginBottom: 20,
         }}
       >
-        <span>Quản lý danh mục</span>
-        <Button onClick={() => setIsCreateModalOpen(true)}>Tạo danh mục</Button>
+        <span>Quản lý sách</span>
+        <Button onClick={() => setIsCreateModalOpen(true)}>Thêm đoạn</Button>
       </div>
       <Table
         bordered
-        dataSource={categories}
+        dataSource={verse}
         loading={loading}
         columns={columns}
         rowKey={"_id"}
@@ -132,20 +141,23 @@ const CategoryTable = (props: IProps) => {
         }}
         onChange={onChange}
       />
+      <SessionProvider>
+        <VerseCreate
+          isCreateModalOpen={isCreateModalOpen}
+          setIsCreateModalOpen={setIsCreateModalOpen}
+        />
+      </SessionProvider>
 
-      <CategoryCreate
-        isCreateModalOpen={isCreateModalOpen}
-        setIsCreateModalOpen={setIsCreateModalOpen}
-      />
-
-      <CategoryUpdate
-        isUpdateModalOpen={isUpdateModalOpen}
-        setIsUpdateModalOpen={setIsUpdateModalOpen}
-        dataUpdate={dataUpdate}
-        setDataUpdate={setDataUpdate}
-      />
+      <SessionProvider>
+        <VerseUpdate
+          isUpdateModalOpen={isUpdateModalOpen}
+          setIsUpdateModalOpen={setIsUpdateModalOpen}
+          dataUpdate={dataUpdate}
+          setDataUpdate={setDataUpdate}
+        />
+      </SessionProvider>
     </>
   );
 };
 
-export default CategoryTable;
+export default VerseTable;

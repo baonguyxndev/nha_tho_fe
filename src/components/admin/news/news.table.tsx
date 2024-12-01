@@ -5,11 +5,14 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { handleDeleteCategoryAction } from "@/utils/actions/categoty.action";
-import CategoryCreate from "./category.create";
-import CategoryUpdate from "./category.update";
+import { SessionProvider } from "next-auth/react";
+import NewsCreate from "./news.create";
+// import NewsUpdate from "./news.update";
+import { handleDeleteNewsAction } from "@/utils/actions/news.action";
+import NewsUpdate from "./news.update";
 
 interface IProps {
-  categories: any;
+  news: any;
   meta: {
     current: number;
     pageSize: number;
@@ -18,8 +21,8 @@ interface IProps {
   };
 }
 
-const CategoryTable = (props: IProps) => {
-  const { categories, meta } = props;
+const NewsTable = (props: IProps) => {
+  const { news, meta } = props;
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -31,7 +34,7 @@ const CategoryTable = (props: IProps) => {
 
   useEffect(() => {
     setLoading(false);
-  }, [categories]);
+  }, [news]);
 
   const columns = [
     {
@@ -41,8 +44,36 @@ const CategoryTable = (props: IProps) => {
       },
     },
     {
-      title: "Tên danh mục",
-      dataIndex: "name",
+      title: "Tiêu đề",
+      dataIndex: "title",
+    },
+    {
+      title: "Mô tả",
+      dataIndex: "desc",
+    },
+    {
+      title: "Năm mục vụ",
+      dataIndex: "ministryYearId",
+    },
+    {
+      title: "Danh mục",
+      dataIndex: "cateId",
+    },
+    {
+      title: "Ảnh",
+      dataIndex: "mainImg",
+      render: (imageUrl: string) => (
+        <img
+          src={imageUrl}
+          alt="news-image"
+          style={{
+            maxWidth: "100px",
+            maxHeight: "100px",
+            objectFit: "cover",
+            borderRadius: "5px",
+          }}
+        />
+      ),
     },
     {
       title: "Tạo lúc",
@@ -57,7 +88,7 @@ const CategoryTable = (props: IProps) => {
         dayjs(updatedAt).format("DD/MM/YYYY HH:mm"),
     },
     {
-      title: "Chức năng",
+      title: "Actions",
       render: (text: any, record: any, index: any) => {
         return (
           <>
@@ -71,11 +102,9 @@ const CategoryTable = (props: IProps) => {
             />
             <Popconfirm
               placement="leftTop"
-              title={"Xác nhận xóa danh mục"}
-              description={"Bạn có chắc chắn muốn xóa danh mục này ?"}
-              onConfirm={async () =>
-                await handleDeleteCategoryAction(record?._id)
-              }
+              title={"Xác nhận xóa sách"}
+              description={"Bạn có chắc chắn muốn xóa sách này ?"}
+              onConfirm={async () => await handleDeleteNewsAction(record?._id)}
               okText="Xác nhận"
               cancelText="Hủy"
             >
@@ -107,12 +136,12 @@ const CategoryTable = (props: IProps) => {
           marginBottom: 20,
         }}
       >
-        <span>Quản lý danh mục</span>
-        <Button onClick={() => setIsCreateModalOpen(true)}>Tạo danh mục</Button>
+        <span>Quản lý tin</span>
+        <Button onClick={() => setIsCreateModalOpen(true)}>Thêm tin</Button>
       </div>
       <Table
         bordered
-        dataSource={categories}
+        dataSource={news}
         loading={loading}
         columns={columns}
         rowKey={"_id"}
@@ -132,20 +161,23 @@ const CategoryTable = (props: IProps) => {
         }}
         onChange={onChange}
       />
+      <SessionProvider>
+        <NewsCreate
+          isCreateModalOpen={isCreateModalOpen}
+          setIsCreateModalOpen={setIsCreateModalOpen}
+        />
+      </SessionProvider>
 
-      <CategoryCreate
-        isCreateModalOpen={isCreateModalOpen}
-        setIsCreateModalOpen={setIsCreateModalOpen}
-      />
-
-      <CategoryUpdate
-        isUpdateModalOpen={isUpdateModalOpen}
-        setIsUpdateModalOpen={setIsUpdateModalOpen}
-        dataUpdate={dataUpdate}
-        setDataUpdate={setDataUpdate}
-      />
+      <SessionProvider>
+        <NewsUpdate
+          isUpdateModalOpen={isUpdateModalOpen}
+          setIsUpdateModalOpen={setIsUpdateModalOpen}
+          dataUpdate={dataUpdate}
+          setDataUpdate={setDataUpdate}
+        />
+      </SessionProvider>
     </>
   );
 };
 
-export default CategoryTable;
+export default NewsTable;

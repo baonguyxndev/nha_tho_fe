@@ -13,19 +13,21 @@ import {
   Select,
 } from "antd";
 import { useSession } from "next-auth/react"; // Nếu sử dụng next-auth để quản lý session
+import { handleCreateVerseAction } from "@/utils/actions/verse.action";
+const { TextArea } = Input; // Khai báo TextArea từ Input
 
 interface IProps {
   isCreateModalOpen: boolean;
   setIsCreateModalOpen: (v: boolean) => void;
 }
 
-const BookCreate = (props: IProps) => {
+const VerseCreate = (props: IProps) => {
   const { isCreateModalOpen, setIsCreateModalOpen } = props;
 
   const [form] = Form.useForm();
   const { data: session } = useSession();
 
-  const [bibleVersions, setBibleVersions] = useState<any[]>([]);
+  const [chapters, setChapters] = useState<any[]>([]);
 
   // Hàm đóng modal
   const handleCloseCreateModal = () => {
@@ -33,16 +35,16 @@ const BookCreate = (props: IProps) => {
     setIsCreateModalOpen(false);
   };
 
-  // Lấy danh sách Bible Versions
+  // Lấy sách
   useEffect(() => {
-    const fetchBibleVersions = async () => {
+    const fetchChapters = async () => {
       if (!session?.user?.accessToken) {
         return;
       }
 
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bible-versions`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chapters`,
           {
             method: "GET",
             headers: {
@@ -52,7 +54,7 @@ const BookCreate = (props: IProps) => {
         );
         const data = await response.json();
         if (data?.data?.results) {
-          setBibleVersions(data.data.results);
+          setChapters(data.data.results);
         } else {
           message.error("Không thể lấy danh sách Bible Versions");
         }
@@ -61,14 +63,12 @@ const BookCreate = (props: IProps) => {
       }
     };
 
-    fetchBibleVersions();
+    fetchChapters();
   }, [session]);
 
   // Hàm xử lý submit form
   const onFinish = async (values: any) => {
-    console.log("values ", values);
-    const res = await handleCreateBookAction(values);
-    console.log("res ", res);
+    const res = await handleCreateVerseAction(values);
     if (res?.data) {
       handleCloseCreateModal();
       message.success("Tạo sách thành công");
@@ -92,9 +92,9 @@ const BookCreate = (props: IProps) => {
         <Row gutter={[15, 15]}>
           <Col span={24}>
             <Form.Item
-              label="Tên sách"
-              name="name"
-              rules={[{ required: true, message: "Vui lòng nhập tên sách!" }]}
+              label="Đoạn số"
+              name="number"
+              rules={[{ required: true, message: "Vui lòng nhập số đoạn" }]}
             >
               <Input />
             </Form.Item>
@@ -102,22 +102,32 @@ const BookCreate = (props: IProps) => {
 
           <Col span={24}>
             <Form.Item
-              label="Phiên bản Kinh Thánh"
-              name="bibleVersionId"
+              label="Chương"
+              name="chapterId"
               rules={[
                 {
                   required: true,
-                  message: "Vui lòng chọn phiên bản Kinh Thánh",
+                  message: "Vui lòng chọn sách",
                 },
               ]}
             >
-              <Select placeholder="Chọn phiên bản Kinh Thánh">
-                {bibleVersions.map((version) => (
-                  <Select.Option key={version._id} value={version._id}>
-                    {version.name}
+              <Select placeholder="Chọn Sách">
+                {chapters.map((chapter) => (
+                  <Select.Option key={chapter._id} value={chapter._id}>
+                    {chapter.number}
                   </Select.Option>
                 ))}
               </Select>
+            </Form.Item>
+          </Col>
+
+          <Col span={24}>
+            <Form.Item
+              label="Mô tả"
+              name="desc"
+              rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
+            >
+              <TextArea rows={4} />
             </Form.Item>
           </Col>
         </Row>
@@ -126,4 +136,4 @@ const BookCreate = (props: IProps) => {
   );
 };
 
-export default BookCreate;
+export default VerseCreate;

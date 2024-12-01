@@ -16,7 +16,7 @@ const AdminHeader = (props: any) => {
   const items: MenuProps["items"] = [
     {
       key: "1",
-      label: <span>Settings</span>,
+      label: <span>Cài đặt</span>,
     },
     {
       key: "2",
@@ -62,7 +62,7 @@ const AdminHeader = (props: any) => {
                   fontSize: "20px",
                 }}
               >
-                {session?.session?.user?.name ?? "No Name"}
+                {session?.session?.user?.name ?? "Admin"}
               </span>{" "}
               <DownOutlined />
             </Space>

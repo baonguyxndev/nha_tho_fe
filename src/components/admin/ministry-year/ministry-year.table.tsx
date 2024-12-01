@@ -5,11 +5,12 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { handleDeleteCategoryAction } from "@/utils/actions/categoty.action";
-import CategoryCreate from "./category.create";
-import CategoryUpdate from "./category.update";
+import { SessionProvider } from "next-auth/react";
+import MinistryYearCreate from "./ministry-year.create";
+import MinistryYearUpdate from "./ministry-year.update";
 
 interface IProps {
-  categories: any;
+  ministryYears: any;
   meta: {
     current: number;
     pageSize: number;
@@ -18,8 +19,8 @@ interface IProps {
   };
 }
 
-const CategoryTable = (props: IProps) => {
-  const { categories, meta } = props;
+const MinistryYearTable = (props: IProps) => {
+  const { ministryYears, meta } = props;
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -31,7 +32,7 @@ const CategoryTable = (props: IProps) => {
 
   useEffect(() => {
     setLoading(false);
-  }, [categories]);
+  }, [ministryYears]);
 
   const columns = [
     {
@@ -41,23 +42,31 @@ const CategoryTable = (props: IProps) => {
       },
     },
     {
-      title: "Tên danh mục",
+      title: "Name",
       dataIndex: "name",
     },
     {
-      title: "Tạo lúc",
+      title: "Description",
+      dataIndex: "desc",
+    },
+    {
+      title: "Category",
+      dataIndex: "cateId",
+    },
+    {
+      title: "Created At",
       dataIndex: "createdAt",
       render: (createdAt: string) =>
         dayjs(createdAt).format("DD/MM/YYYY HH:mm"),
     },
     {
-      title: "Sửa lúc",
+      title: "Updated At",
       dataIndex: "updatedAt",
       render: (updatedAt: string) =>
         dayjs(updatedAt).format("DD/MM/YYYY HH:mm"),
     },
     {
-      title: "Chức năng",
+      title: "Actions",
       render: (text: any, record: any, index: any) => {
         return (
           <>
@@ -71,8 +80,8 @@ const CategoryTable = (props: IProps) => {
             />
             <Popconfirm
               placement="leftTop"
-              title={"Xác nhận xóa danh mục"}
-              description={"Bạn có chắc chắn muốn xóa danh mục này ?"}
+              title={"Xác nhận xóa sách"}
+              description={"Bạn có chắc chắn muốn xóa sách này ?"}
               onConfirm={async () =>
                 await handleDeleteCategoryAction(record?._id)
               }
@@ -107,12 +116,14 @@ const CategoryTable = (props: IProps) => {
           marginBottom: 20,
         }}
       >
-        <span>Quản lý danh mục</span>
-        <Button onClick={() => setIsCreateModalOpen(true)}>Tạo danh mục</Button>
+        <span>Quản lý sách</span>
+        <Button onClick={() => setIsCreateModalOpen(true)}>
+          Thêm năm mục vụ
+        </Button>
       </div>
       <Table
         bordered
-        dataSource={categories}
+        dataSource={ministryYears}
         loading={loading}
         columns={columns}
         rowKey={"_id"}
@@ -132,20 +143,23 @@ const CategoryTable = (props: IProps) => {
         }}
         onChange={onChange}
       />
+      <SessionProvider>
+        <MinistryYearCreate
+          isCreateModalOpen={isCreateModalOpen}
+          setIsCreateModalOpen={setIsCreateModalOpen}
+        />
+      </SessionProvider>
 
-      <CategoryCreate
-        isCreateModalOpen={isCreateModalOpen}
-        setIsCreateModalOpen={setIsCreateModalOpen}
-      />
-
-      <CategoryUpdate
-        isUpdateModalOpen={isUpdateModalOpen}
-        setIsUpdateModalOpen={setIsUpdateModalOpen}
-        dataUpdate={dataUpdate}
-        setDataUpdate={setDataUpdate}
-      />
+      <SessionProvider>
+        <MinistryYearUpdate
+          isUpdateModalOpen={isUpdateModalOpen}
+          setIsUpdateModalOpen={setIsUpdateModalOpen}
+          dataUpdate={dataUpdate}
+          setDataUpdate={setDataUpdate}
+        />
+      </SessionProvider>
     </>
   );
 };
 
-export default CategoryTable;
+export default MinistryYearTable;

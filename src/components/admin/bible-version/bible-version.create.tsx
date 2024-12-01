@@ -1,4 +1,4 @@
-import { handleCreateCategoryAction } from "@/utils/actions/categoty.action";
+import { handleCreateBibleVersionAction } from "@/utils/actions/bible-version.action";
 import { Modal, Input, Form, Row, Col, message, notification } from "antd";
 
 interface IProps {
@@ -6,7 +6,7 @@ interface IProps {
   setIsCreateModalOpen: (v: boolean) => void;
 }
 
-const CategoryCreate = (props: IProps) => {
+const BibleVersionCreate = (props: IProps) => {
   const { isCreateModalOpen, setIsCreateModalOpen } = props;
 
   const [form] = Form.useForm();
@@ -17,7 +17,7 @@ const CategoryCreate = (props: IProps) => {
   };
 
   const onFinish = async (values: any) => {
-    const res = await handleCreateCategoryAction(values);
+    const res = await handleCreateBibleVersionAction(values);
     if (res?.data) {
       handleCloseCreateModal();
       message.success("Tạo danh mục thành công");
@@ -56,4 +56,4 @@ const CategoryCreate = (props: IProps) => {
   );
 };
 
-export default CategoryCreate;
+export default BibleVersionCreate;

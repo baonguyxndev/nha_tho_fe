@@ -1,15 +1,14 @@
 "use client";
 import { DeleteTwoTone, EditTwoTone } from "@ant-design/icons";
 import { Button, Popconfirm, Table, Tag } from "antd";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import { handleDeleteCategoryAction } from "@/utils/actions/categoty.action";
-import CategoryCreate from "./category.create";
-import CategoryUpdate from "./category.update";
+import BibleVersionCreate from "./bible-version.create";
+import BibleVersionUpdate from "./bible-version.update";
 
 interface IProps {
-  categories: any;
+  bibleVersion: any;
   meta: {
     current: number;
     pageSize: number;
@@ -18,8 +17,8 @@ interface IProps {
   };
 }
 
-const CategoryTable = (props: IProps) => {
-  const { categories, meta } = props;
+const BibleVersionTable = (props: IProps) => {
+  const { bibleVersion, meta } = props;
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -31,7 +30,7 @@ const CategoryTable = (props: IProps) => {
 
   useEffect(() => {
     setLoading(false);
-  }, [categories]);
+  }, [bibleVersion]);
 
   const columns = [
     {
@@ -41,7 +40,7 @@ const CategoryTable = (props: IProps) => {
       },
     },
     {
-      title: "Tên danh mục",
+      title: "Phiên bản",
       dataIndex: "name",
     },
     {
@@ -59,6 +58,12 @@ const CategoryTable = (props: IProps) => {
     {
       title: "Chức năng",
       render: (text: any, record: any, index: any) => {
+        function handleDeleteBibleVersionAction(
+          _id: any
+        ): void | PromiseLike<void> {
+          throw new Error("Function not implemented.");
+        }
+
         return (
           <>
             <EditTwoTone
@@ -74,7 +79,7 @@ const CategoryTable = (props: IProps) => {
               title={"Xác nhận xóa danh mục"}
               description={"Bạn có chắc chắn muốn xóa danh mục này ?"}
               onConfirm={async () =>
-                await handleDeleteCategoryAction(record?._id)
+                await handleDeleteBibleVersionAction(record?._id)
               }
               okText="Xác nhận"
               cancelText="Hủy"
@@ -108,11 +113,13 @@ const CategoryTable = (props: IProps) => {
         }}
       >
         <span>Quản lý danh mục</span>
-        <Button onClick={() => setIsCreateModalOpen(true)}>Tạo danh mục</Button>
+        <Button onClick={() => setIsCreateModalOpen(true)}>
+          Tạo phiên bản kinh thánh
+        </Button>
       </div>
       <Table
         bordered
-        dataSource={categories}
+        dataSource={bibleVersion}
         loading={loading}
         columns={columns}
         rowKey={"_id"}
@@ -133,12 +140,12 @@ const CategoryTable = (props: IProps) => {
         onChange={onChange}
       />
 
-      <CategoryCreate
+      <BibleVersionCreate
         isCreateModalOpen={isCreateModalOpen}
         setIsCreateModalOpen={setIsCreateModalOpen}
       />
 
-      <CategoryUpdate
+      <BibleVersionUpdate
         isUpdateModalOpen={isUpdateModalOpen}
         setIsUpdateModalOpen={setIsUpdateModalOpen}
         dataUpdate={dataUpdate}
@@ -148,4 +155,4 @@ const CategoryTable = (props: IProps) => {
   );
 };
 
-export default CategoryTable;
+export default BibleVersionTable;
