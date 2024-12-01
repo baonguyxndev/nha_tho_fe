@@ -13,19 +13,20 @@ import {
   Select,
 } from "antd";
 import { useSession } from "next-auth/react"; // Nếu sử dụng next-auth để quản lý session
+import { handleCreateMinistryYearAction } from "@/utils/actions/ministry-year.action";
 
 interface IProps {
   isCreateModalOpen: boolean;
   setIsCreateModalOpen: (v: boolean) => void;
 }
 
-const BookCreate = (props: IProps) => {
+const MinistryYearCreate = (props: IProps) => {
   const { isCreateModalOpen, setIsCreateModalOpen } = props;
 
   const [form] = Form.useForm();
   const { data: session } = useSession();
 
-  const [bibleVersions, setBibleVersions] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
 
   // Hàm đóng modal
   const handleCloseCreateModal = () => {
@@ -35,14 +36,14 @@ const BookCreate = (props: IProps) => {
 
   // Lấy danh sách Bible Versions
   useEffect(() => {
-    const fetchBibleVersions = async () => {
+    const fetchCategories = async () => {
       if (!session?.user?.accessToken) {
         return;
       }
 
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bible-versions`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories`,
           {
             method: "GET",
             headers: {
@@ -52,7 +53,7 @@ const BookCreate = (props: IProps) => {
         );
         const data = await response.json();
         if (data?.data?.results) {
-          setBibleVersions(data.data.results);
+          setCategories(data.data.results);
         } else {
           message.error("Không thể lấy danh sách Bible Versions");
         }
@@ -61,20 +62,20 @@ const BookCreate = (props: IProps) => {
       }
     };
 
-    fetchBibleVersions();
+    fetchCategories();
   }, [session]);
 
   // Hàm xử lý submit form
   const onFinish = async (values: any) => {
     console.log("values ", values);
-    const res = await handleCreateBookAction(values);
+    const res = await handleCreateMinistryYearAction(values);
     console.log("res ", res);
     if (res?.data) {
       handleCloseCreateModal();
-      message.success("Tạo sách thành công");
+      message.success("Tạo năm mục vụ thành công");
     } else {
       notification.error({
-        message: "Lỗi tạo sách",
+        message: "Lỗi tạo năm mục vụ",
         description: res?.message,
       });
     }
@@ -82,7 +83,7 @@ const BookCreate = (props: IProps) => {
 
   return (
     <Modal
-      title="Thêm sách mới"
+      title="Thêm năm mục vụ"
       open={isCreateModalOpen}
       onOk={() => form.submit()}
       onCancel={handleCloseCreateModal}
@@ -92,9 +93,9 @@ const BookCreate = (props: IProps) => {
         <Row gutter={[15, 15]}>
           <Col span={24}>
             <Form.Item
-              label="Tên sách"
+              label="Tên"
               name="name"
-              rules={[{ required: true, message: "Vui lòng nhập tên sách!" }]}
+              rules={[{ required: true, message: "Vui lòng nhập tên sách" }]}
             >
               <Input />
             </Form.Item>
@@ -102,19 +103,29 @@ const BookCreate = (props: IProps) => {
 
           <Col span={24}>
             <Form.Item
-              label="Phiên bản Kinh Thánh"
-              name="bibleVersionId"
+              label="Mô tả"
+              name="desc"
+              rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+
+          <Col span={24}>
+            <Form.Item
+              label="Danh mục"
+              name="cateId"
               rules={[
                 {
                   required: true,
-                  message: "Vui lòng chọn phiên bản Kinh Thánh",
+                  message: "Vui lòng chọn danh mục",
                 },
               ]}
             >
-              <Select placeholder="Chọn phiên bản Kinh Thánh">
-                {bibleVersions.map((version) => (
-                  <Select.Option key={version._id} value={version._id}>
-                    {version.name}
+              <Select placeholder="Chọn danh mục">
+                {categories.map((cate) => (
+                  <Select.Option key={cate._id} value={cate._id}>
+                    {cate.name}
                   </Select.Option>
                 ))}
               </Select>
@@ -126,4 +137,4 @@ const BookCreate = (props: IProps) => {
   );
 };
 
-export default BookCreate;
+export default MinistryYearCreate;

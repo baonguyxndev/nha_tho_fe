@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { handleCreateBookAction } from "@/utils/actions/book.action";
 import {
   Modal,
   Input,
@@ -13,19 +12,20 @@ import {
   Select,
 } from "antd";
 import { useSession } from "next-auth/react"; // Nếu sử dụng next-auth để quản lý session
+import { handleCreateChapterAction } from "@/utils/actions/chapter.action";
 
 interface IProps {
   isCreateModalOpen: boolean;
   setIsCreateModalOpen: (v: boolean) => void;
 }
 
-const BookCreate = (props: IProps) => {
+const ChapterCreate = (props: IProps) => {
   const { isCreateModalOpen, setIsCreateModalOpen } = props;
 
   const [form] = Form.useForm();
   const { data: session } = useSession();
 
-  const [bibleVersions, setBibleVersions] = useState<any[]>([]);
+  const [books, setBooks] = useState<any[]>([]);
 
   // Hàm đóng modal
   const handleCloseCreateModal = () => {
@@ -33,16 +33,16 @@ const BookCreate = (props: IProps) => {
     setIsCreateModalOpen(false);
   };
 
-  // Lấy danh sách Bible Versions
+  // Lấy sách
   useEffect(() => {
-    const fetchBibleVersions = async () => {
+    const fetchBooks = async () => {
       if (!session?.user?.accessToken) {
         return;
       }
 
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bible-versions`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/books`,
           {
             method: "GET",
             headers: {
@@ -52,23 +52,21 @@ const BookCreate = (props: IProps) => {
         );
         const data = await response.json();
         if (data?.data?.results) {
-          setBibleVersions(data.data.results);
+          setBooks(data.data.results);
         } else {
-          message.error("Không thể lấy danh sách Bible Versions");
+          message.error("Không thể lấy sách");
         }
       } catch (error: any) {
-        message.error("Có lỗi xảy ra khi lấy danh sách Bible Versions");
+        message.error("Có lỗi xảy ra khi lấy sách");
       }
     };
 
-    fetchBibleVersions();
+    fetchBooks();
   }, [session]);
 
   // Hàm xử lý submit form
   const onFinish = async (values: any) => {
-    console.log("values ", values);
-    const res = await handleCreateBookAction(values);
-    console.log("res ", res);
+    const res = await handleCreateChapterAction(values);
     if (res?.data) {
       handleCloseCreateModal();
       message.success("Tạo sách thành công");
@@ -92,9 +90,11 @@ const BookCreate = (props: IProps) => {
         <Row gutter={[15, 15]}>
           <Col span={24}>
             <Form.Item
-              label="Tên sách"
-              name="name"
-              rules={[{ required: true, message: "Vui lòng nhập tên sách!" }]}
+              label="Chương số"
+              name="number"
+              rules={[
+                { required: true, message: "Vui lòng nhập chương số mấy" },
+              ]}
             >
               <Input />
             </Form.Item>
@@ -102,19 +102,19 @@ const BookCreate = (props: IProps) => {
 
           <Col span={24}>
             <Form.Item
-              label="Phiên bản Kinh Thánh"
-              name="bibleVersionId"
+              label="Sách"
+              name="bookId"
               rules={[
                 {
                   required: true,
-                  message: "Vui lòng chọn phiên bản Kinh Thánh",
+                  message: "Vui lòng chọn sách",
                 },
               ]}
             >
-              <Select placeholder="Chọn phiên bản Kinh Thánh">
-                {bibleVersions.map((version) => (
-                  <Select.Option key={version._id} value={version._id}>
-                    {version.name}
+              <Select placeholder="Chọn sách">
+                {books.map((book) => (
+                  <Select.Option key={book._id} value={book._id}>
+                    {book.name}
                   </Select.Option>
                 ))}
               </Select>
@@ -126,4 +126,4 @@ const BookCreate = (props: IProps) => {
   );
 };
 
-export default BookCreate;
+export default ChapterCreate;

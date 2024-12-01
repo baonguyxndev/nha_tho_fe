@@ -4,9 +4,10 @@ import { Button, Popconfirm, Table, Tag } from "antd";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import { handleDeleteCategoryAction } from "@/utils/actions/categoty.action";
-import BookUpdate from "./book.update";
+import { SessionProvider } from "next-auth/react";
 import BookCreate from "./book.create";
+import { handleDeleteBookAction } from "@/utils/actions/book.action";
+import BookUpdate from "./book.update";
 
 interface IProps {
   books: any;
@@ -41,27 +42,27 @@ const BookTable = (props: IProps) => {
       },
     },
     {
-      title: "Name",
+      title: "Tên",
       dataIndex: "name",
     },
     {
-      title: "Bibile Version",
+      title: "Bản Kinh Thánh",
       dataIndex: "bibleVersionId",
     },
     {
-      title: "Created At",
+      title: "Tạo lúc",
       dataIndex: "createdAt",
       render: (createdAt: string) =>
         dayjs(createdAt).format("DD/MM/YYYY HH:mm"),
     },
     {
-      title: "Updated At",
+      title: "Sửa lúc",
       dataIndex: "updatedAt",
       render: (updatedAt: string) =>
         dayjs(updatedAt).format("DD/MM/YYYY HH:mm"),
     },
     {
-      title: "Actions",
+      title: "Chức năng",
       render: (text: any, record: any, index: any) => {
         return (
           <>
@@ -75,11 +76,9 @@ const BookTable = (props: IProps) => {
             />
             <Popconfirm
               placement="leftTop"
-              title={"Xác nhận xóa danh mục"}
-              description={"Bạn có chắc chắn muốn xóa danh mục này ?"}
-              onConfirm={async () =>
-                await handleDeleteCategoryAction(record?._id)
-              }
+              title={"Xác nhận xóa sách"}
+              description={"Bạn có chắc chắn muốn xóa sách này ?"}
+              onConfirm={async () => await handleDeleteBookAction(record?._id)}
               okText="Xác nhận"
               cancelText="Hủy"
             >
@@ -111,7 +110,7 @@ const BookTable = (props: IProps) => {
           marginBottom: 20,
         }}
       >
-        <span>Quản lý danh mục</span>
+        <span>Quản lý sách</span>
         <Button onClick={() => setIsCreateModalOpen(true)}>Thêm sách</Button>
       </div>
       <Table
@@ -136,18 +135,21 @@ const BookTable = (props: IProps) => {
         }}
         onChange={onChange}
       />
+      <SessionProvider>
+        <BookCreate
+          isCreateModalOpen={isCreateModalOpen}
+          setIsCreateModalOpen={setIsCreateModalOpen}
+        />
+      </SessionProvider>
 
-      <BookCreate
-        isCreateModalOpen={isCreateModalOpen}
-        setIsCreateModalOpen={setIsCreateModalOpen}
-      />
-
-      <BookUpdate
-        isUpdateModalOpen={isUpdateModalOpen}
-        setIsUpdateModalOpen={setIsUpdateModalOpen}
-        dataUpdate={dataUpdate}
-        setDataUpdate={setDataUpdate}
-      />
+      <SessionProvider>
+        <BookUpdate
+          isUpdateModalOpen={isUpdateModalOpen}
+          setIsUpdateModalOpen={setIsUpdateModalOpen}
+          dataUpdate={dataUpdate}
+          setDataUpdate={setDataUpdate}
+        />
+      </SessionProvider>
     </>
   );
 };

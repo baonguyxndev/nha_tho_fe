@@ -1,4 +1,4 @@
-import { handleUpdateCategoryAction } from "@/utils/actions/categoty.action";
+import { handleUpdateBibleVersionAction } from "@/utils/actions/bible-version.action";
 import { Modal, Input, Form, Row, Col, message, notification } from "antd";
 import { useEffect } from "react";
 
@@ -9,7 +9,7 @@ interface IProps {
   setDataUpdate: any;
 }
 
-const CategoryUpdate = (props: IProps) => {
+const BibleVersionUpdate = (props: IProps) => {
   const { isUpdateModalOpen, setIsUpdateModalOpen, dataUpdate, setDataUpdate } =
     props;
 
@@ -32,17 +32,17 @@ const CategoryUpdate = (props: IProps) => {
 
   const onFinish = async (values: any) => {
     if (dataUpdate) {
-      const { name } = values;
-      const res = await handleUpdateCategoryAction({
+      const { name, phone, address } = values;
+      const res = await handleUpdateBibleVersionAction({
         _id: dataUpdate._id,
         name,
       });
       if (res?.data) {
         handleCloseUpdateModal();
-        message.success("Sửa danh mục thành công");
+        message.success("Sửa bản Kinh Thánh thành công");
       } else {
         notification.error({
-          message: "Lỗi sửa danh mục ",
+          message: "Lỗi sửa bản Kinh Thánh",
           description: res?.message,
         });
       }
@@ -51,7 +51,7 @@ const CategoryUpdate = (props: IProps) => {
 
   return (
     <Modal
-      title="Sửa danh mục"
+      title="Sửa bản Kinh Thánh"
       open={isUpdateModalOpen}
       onOk={() => form.submit()}
       onCancel={() => handleCloseUpdateModal()}
@@ -61,10 +61,10 @@ const CategoryUpdate = (props: IProps) => {
         <Row gutter={[15, 15]}>
           <Col span={24} md={12}>
             <Form.Item
-              label="Tên danh mục"
+              label="Bản Kinh Thánh"
               name="name"
               rules={[
-                { required: true, message: "Vui lòng điền tên danh mục" },
+                { required: true, message: "Vui lòng nhập tên bản Kinh Thánh" },
               ]}
             >
               <Input />
@@ -76,4 +76,4 @@ const CategoryUpdate = (props: IProps) => {
   );
 };
 
-export default CategoryUpdate;
+export default BibleVersionUpdate;
