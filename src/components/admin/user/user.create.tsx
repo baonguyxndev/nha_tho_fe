@@ -20,10 +20,10 @@ const UserCreate = (props: IProps) => {
     const res = await handleCreateUserAction(values);
     if (res?.data) {
       handleCloseCreateModal();
-      message.success("Create succeed!");
+      message.success("Thêm nhân sự thành công");
     } else {
       notification.error({
-        message: "Create User error",
+        message: "Lỗi thêm nhân sự",
         description: res?.message,
       });
     }
@@ -31,7 +31,7 @@ const UserCreate = (props: IProps) => {
 
   return (
     <Modal
-      title="Add new user"
+      title="Thêm nhân sự"
       open={isCreateModalOpen}
       onOk={() => form.submit()}
       onCancel={() => handleCloseCreateModal()}
@@ -50,7 +50,7 @@ const UserCreate = (props: IProps) => {
           </Col>
           <Col span={24}>
             <Form.Item
-              label="Password"
+              label="Mật khẩu"
               name="password"
               rules={[
                 { required: true, message: "Please input your password!" },
@@ -61,7 +61,7 @@ const UserCreate = (props: IProps) => {
           </Col>
           <Col span={24}>
             <Form.Item
-              label="Name"
+              label="Tên"
               name="name"
               rules={[{ required: true, message: "Please input your name!" }]}
             >

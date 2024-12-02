@@ -6,10 +6,7 @@ import React from "react";
 const HomePage = () => {
   return (
     <div style={{ padding: 20 }}>
-      <Result
-        icon={<CrownOutlined />}
-        title="Fullstack Next/Nest - createdBy @hoidanit"
-      />
+      <Result icon={<CrownOutlined />} title="Giáo xứ Tân Trang" />
     </div>
   );
 };
