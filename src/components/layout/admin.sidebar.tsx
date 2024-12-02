@@ -2,30 +2,53 @@
 import Layout from "antd/es/layout";
 import Menu from "antd/es/menu";
 import {
-  AimOutlined,
   AppstoreOutlined,
-  CodeOutlined,
-  DownOutlined,
-  MailOutlined,
-  ManOutlined,
   MenuOutlined,
-  SettingOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AdminContext } from "@/library/admin.context";
 import type { MenuProps } from "antd";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type MenuItem = Required<MenuProps>["items"][number];
+
 const AdminSideBar = () => {
   const { Sider } = Layout;
   const { collapseMenu } = useContext(AdminContext)!;
+  const router = useRouter();
+
+  // State lưu key của menu
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const [openKeys, setOpenKeys] = useState<string[]>([]);
+
+  // Cập nhật key khi đường dẫn thay đổi
+  useEffect(() => {
+    const path = window.location.pathname;
+
+    // Xác định selectedKey dựa trên đường dẫn
+    const selected = path.split("/").slice(2).join("/"); // Lấy phần sau `/dashboard`
+    setSelectedKeys([selected]);
+
+    // Xác định openKeys (mở group cha)
+    if (
+      selected.startsWith("categories") ||
+      selected.startsWith("books") ||
+      selected.startsWith("news")
+    ) {
+      setOpenKeys(["sub4"]); // Mở group "Quản lý"
+    }
+  }, [router]);
+
+  const handleMenuClick: MenuProps["onClick"] = (e) => {
+    setSelectedKeys([e.key]); // Cập nhật selectedKeys khi người dùng click
+  };
 
   const items: MenuItem[] = [
     {
       key: "grp",
-      label: "Hỏi Dân IT",
+      label: "Giáo xứ Tân Trang",
       type: "group",
       children: [
         {
@@ -34,7 +57,7 @@ const AdminSideBar = () => {
           icon: <AppstoreOutlined />,
         },
         {
-          key: "users",
+          key: "user",
           label: <Link href={"/dashboard/user"}>Nhân sự</Link>,
           icon: <TeamOutlined />,
         },
@@ -44,26 +67,32 @@ const AdminSideBar = () => {
           icon: <MenuOutlined />,
           children: [
             {
-              key: "1",
+              key: "categories",
               label: <Link href={"/dashboard/categories"}>Danh mục</Link>,
             },
-            { key: "2", label: <Link href={"/dashboard/books"}>Sách</Link> },
-            { key: "3", label: <Link href={"/dashboard/news"}>Tin</Link> },
             {
-              key: "4",
+              key: "books",
+              label: <Link href={"/dashboard/books"}>Sách</Link>,
+            },
+            { key: "news", label: <Link href={"/dashboard/news"}>Tin</Link> },
+            {
+              key: "bible-versions",
               label: (
                 <Link href={"/dashboard/bible-versions"}>Bản kinh thánh</Link>
               ),
             },
             {
-              key: "5",
+              key: "ministry-years",
               label: <Link href={"/dashboard/ministry-years"}>Năm mục vụ</Link>,
             },
             {
-              key: "6",
+              key: "chapters",
               label: <Link href={"/dashboard/chapters"}>Chương</Link>,
             },
-            { key: "7", label: <Link href={"/dashboard/verses"}>Đoạn</Link> },
+            {
+              key: "verses",
+              label: <Link href={"/dashboard/verses"}>Đoạn</Link>,
+            },
           ],
         },
       ],
@@ -74,7 +103,10 @@ const AdminSideBar = () => {
     <Sider collapsed={collapseMenu}>
       <Menu
         mode="inline"
-        defaultSelectedKeys={["dashboard"]}
+        selectedKeys={selectedKeys} // Đồng bộ selectedKeys
+        openKeys={openKeys} // Đồng bộ openKeys
+        onOpenChange={(keys) => setOpenKeys(keys)} // Cập nhật openKeys khi người dùng mở/đóng
+        onClick={handleMenuClick} // Cập nhật selectedKeys khi click
         items={items}
         style={{ height: "100vh" }}
       />

@@ -1,6 +1,6 @@
 "use client";
 import { DeleteTwoTone, EditTwoTone } from "@ant-design/icons";
-import { Button, Popconfirm, Table, Tag } from "antd";
+import { Button, Popconfirm, Table, Tag, Spin } from "antd"; // Thêm Spin từ Ant Design
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
@@ -28,10 +28,16 @@ const BookTable = (props: IProps) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
   const [dataUpdate, setDataUpdate] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true); // Trạng thái loading
 
+  // Giả sử bạn gọi API ở đây, bạn sẽ cập nhật lại loading sau khi nhận được dữ liệu
   useEffect(() => {
-    setLoading(false);
+    setLoading(true); // Bắt đầu loading khi component mount
+    // Giả lập việc gọi API
+    setTimeout(() => {
+      // Khi dữ liệu được trả về, cập nhật lại loading
+      setLoading(false); // Tắt loading khi dữ liệu đã được tải
+    }, 2000); // Giả lập thời gian tải 2 giây (thay bằng thời gian thực từ API)
   }, [books]);
 
   const columns = [
@@ -102,39 +108,57 @@ const BookTable = (props: IProps) => {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 20,
-        }}
-      >
-        <span>Quản lý sách</span>
-        <Button onClick={() => setIsCreateModalOpen(true)}>Thêm sách</Button>
-      </div>
-      <Table
-        bordered
-        dataSource={books}
-        loading={loading}
-        columns={columns}
-        rowKey={"_id"}
-        pagination={{
-          current: meta?.current,
-          pageSize: meta?.pageSize,
-          showSizeChanger: true,
-          total: meta?.total,
-          showTotal: (total, range) => {
-            return (
-              <div>
-                {" "}
-                {range[0]}-{range[1]} trên {total} rows
-              </div>
-            );
-          },
-        }}
-        onChange={onChange}
-      />
+      {/* Hiển thị vòng loading */}
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          <Spin size="large" /> {/* Hiển thị vòng loading */}
+        </div>
+      ) : (
+        <>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 20,
+            }}
+          >
+            <span>Quản lý sách</span>
+            <Button onClick={() => setIsCreateModalOpen(true)}>
+              Thêm sách
+            </Button>
+          </div>
+          <Table
+            bordered
+            dataSource={books}
+            loading={loading}
+            columns={columns}
+            rowKey={"_id"}
+            pagination={{
+              current: meta?.current,
+              pageSize: meta?.pageSize,
+              showSizeChanger: true,
+              total: meta?.total,
+              showTotal: (total, range) => {
+                return (
+                  <div>
+                    {" "}
+                    {range[0]}-{range[1]} trên {total} rows
+                  </div>
+                );
+              },
+            }}
+            onChange={onChange}
+          />
+        </>
+      )}
+
       <SessionProvider>
         <BookCreate
           isCreateModalOpen={isCreateModalOpen}

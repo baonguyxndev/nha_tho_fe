@@ -1,6 +1,6 @@
 "use client";
 import { DeleteTwoTone, EditTwoTone } from "@ant-design/icons";
-import { Button, Popconfirm, Table, Tag } from "antd";
+import { Button, Popconfirm, Spin, Table, Tag } from "antd";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
@@ -33,7 +33,11 @@ const NewsTable = (props: IProps) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    setLoading(false);
+    if (news && news.length > 0) {
+      setLoading(false); // Khi dữ liệu đã có, tắt trạng thái loading
+    } else {
+      setLoading(true); // Nếu chưa có dữ liệu, giữ trạng thái loading
+    }
   }, [news]);
 
   const columns = [
@@ -102,8 +106,8 @@ const NewsTable = (props: IProps) => {
             />
             <Popconfirm
               placement="leftTop"
-              title={"Xác nhận xóa sách"}
-              description={"Bạn có chắc chắn muốn xóa sách này ?"}
+              title={"Xác nhận xóa tin"}
+              description={"Bạn có chắc chắn muốn xóa tin này ?"}
               onConfirm={async () => await handleDeleteNewsAction(record?._id)}
               okText="Xác nhận"
               cancelText="Hủy"
@@ -128,39 +132,54 @@ const NewsTable = (props: IProps) => {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 20,
-        }}
-      >
-        <span>Quản lý tin</span>
-        <Button onClick={() => setIsCreateModalOpen(true)}>Thêm tin</Button>
-      </div>
-      <Table
-        bordered
-        dataSource={news}
-        loading={loading}
-        columns={columns}
-        rowKey={"_id"}
-        pagination={{
-          current: meta?.current,
-          pageSize: meta?.pageSize,
-          showSizeChanger: true,
-          total: meta?.total,
-          showTotal: (total, range) => {
-            return (
-              <div>
-                {" "}
-                {range[0]}-{range[1]} trên {total} rows
-              </div>
-            );
-          },
-        }}
-        onChange={onChange}
-      />
+      {/* Hiển thị vòng loading */}
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          <Spin size="large" /> {/* Hiển thị vòng loading */}
+        </div>
+      ) : (
+        <>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 20,
+            }}
+          >
+            <span>Quản lý tin</span>
+            <Button onClick={() => setIsCreateModalOpen(true)}>Thêm tin</Button>
+          </div>
+          <Table
+            bordered
+            dataSource={news}
+            loading={loading}
+            columns={columns}
+            rowKey={"_id"}
+            pagination={{
+              current: meta?.current,
+              pageSize: meta?.pageSize,
+              showSizeChanger: true,
+              total: meta?.total,
+              showTotal: (total, range) => {
+                return (
+                  <div>
+                    {" "}
+                    {range[0]}-{range[1]} trên {total} rows
+                  </div>
+                );
+              },
+            }}
+            onChange={onChange}
+          />
+        </>
+      )}
       <SessionProvider>
         <NewsCreate
           isCreateModalOpen={isCreateModalOpen}

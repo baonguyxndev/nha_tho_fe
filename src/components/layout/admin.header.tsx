@@ -1,17 +1,17 @@
 "use client";
 import { AdminContext } from "@/library/admin.context";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
-import { Button, Layout } from "antd";
-import { useContext } from "react";
-import { DownOutlined, SmileOutlined } from "@ant-design/icons";
+import { Button, Layout, Spin, Dropdown, Space } from "antd";
+import { useState, useContext } from "react";
+import { DownOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Dropdown, Space } from "antd";
 import { signOut } from "next-auth/react";
 
 const AdminHeader = (props: any) => {
   const session = props;
   const { Header } = Layout;
   const { collapseMenu, setCollapseMenu } = useContext(AdminContext)!;
+  const [loading, setLoading] = useState(false); // State quản lý loading
 
   const items: MenuProps["items"] = [
     {
@@ -21,12 +21,44 @@ const AdminHeader = (props: any) => {
     {
       key: "2",
       danger: true,
-      label: <span onClick={() => signOut()}>Đăng xuất</span>,
+      label: (
+        <span
+          onClick={async () => {
+            setLoading(true); // Hiển thị loading
+            try {
+              await signOut();
+            } finally {
+              setLoading(false); // Tắt loading
+            }
+          }}
+        >
+          Đăng xuất
+        </span>
+      ),
     },
   ];
 
   return (
     <>
+      {/* Overlay loading */}
+      {loading && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            zIndex: 1000,
+          }}
+        >
+          <Spin size="large" tip="Đang xử lý..." />
+        </div>
+      )}
       <Header
         style={{
           padding: 0,

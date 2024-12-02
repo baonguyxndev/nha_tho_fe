@@ -1,6 +1,6 @@
 "use client";
 import { DeleteTwoTone, EditTwoTone } from "@ant-design/icons";
-import { Button, Popconfirm, Table, Tag } from "antd";
+import { Button, Popconfirm, Table, Tag, Spin } from "antd";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
@@ -31,7 +31,11 @@ const ChapterTable = (props: IProps) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    setLoading(false);
+    if (chapters && chapters.length > 0) {
+      setLoading(false); // Khi dữ liệu đã có, tắt trạng thái loading
+    } else {
+      setLoading(true); // Nếu chưa có dữ liệu, giữ trạng thái loading
+    }
   }, [chapters]);
 
   const columns = [
@@ -76,8 +80,8 @@ const ChapterTable = (props: IProps) => {
             />
             <Popconfirm
               placement="leftTop"
-              title={"Xác nhận xóa sách"}
-              description={"Bạn có chắc chắn muốn xóa sách này ?"}
+              title={"Xác nhận xóa chương"}
+              description={"Bạn có chắc chắn muốn xóa chương này ?"}
               onConfirm={async () =>
                 await handleDeleteCategoryAction(record?._id)
               }
@@ -104,39 +108,56 @@ const ChapterTable = (props: IProps) => {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 20,
-        }}
-      >
-        <span>Quản lý chương</span>
-        <Button onClick={() => setIsCreateModalOpen(true)}>Thêm chương</Button>
-      </div>
-      <Table
-        bordered
-        dataSource={chapters}
-        loading={loading}
-        columns={columns}
-        rowKey={"_id"}
-        pagination={{
-          current: meta?.current,
-          pageSize: meta?.pageSize,
-          showSizeChanger: true,
-          total: meta?.total,
-          showTotal: (total, range) => {
-            return (
-              <div>
-                {" "}
-                {range[0]}-{range[1]} trên {total} rows
-              </div>
-            );
-          },
-        }}
-        onChange={onChange}
-      />
+      {/* Hiển thị vòng loading */}
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          <Spin size="large" /> {/* Hiển thị vòng loading */}
+        </div>
+      ) : (
+        <>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 20,
+            }}
+          >
+            <span>Quản lý chương</span>
+            <Button onClick={() => setIsCreateModalOpen(true)}>
+              Thêm chương
+            </Button>
+          </div>
+          <Table
+            bordered
+            dataSource={chapters}
+            loading={loading}
+            columns={columns}
+            rowKey={"_id"}
+            pagination={{
+              current: meta?.current,
+              pageSize: meta?.pageSize,
+              showSizeChanger: true,
+              total: meta?.total,
+              showTotal: (total, range) => {
+                return (
+                  <div>
+                    {" "}
+                    {range[0]}-{range[1]} trên {total} rows
+                  </div>
+                );
+              },
+            }}
+            onChange={onChange}
+          />
+        </>
+      )}
       <SessionProvider>
         <ChapterCreate
           isCreateModalOpen={isCreateModalOpen}
