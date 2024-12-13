@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import MinistryYearTable from "@/components/admin/ministry-year/ministry-year.table";
 import { sendRequest } from "@/utils/api";
+import { SessionProvider } from "next-auth/react";
 
 interface IProps {
   params: { id: string };
@@ -28,10 +29,12 @@ const ManageMinistryYearsPage = async (props: IProps) => {
 
   return (
     <div>
-      <MinistryYearTable
-        ministryYears={res?.data?.results ?? []}
-        meta={res?.data?.meta}
-      />
+      <SessionProvider>
+        <MinistryYearTable
+          ministryYears={res?.data?.results ?? []}
+          meta={res?.data?.meta}
+        />
+      </SessionProvider>
     </div>
   );
 };

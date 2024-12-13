@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import BookTable from "@/components/admin/book/book.table";
 import { sendRequest } from "@/utils/api";
+import { SessionProvider } from "next-auth/react";
 
 interface IProps {
   params: { id: string };
@@ -28,7 +29,9 @@ const ManageBooksPage = async (props: IProps) => {
 
   return (
     <div>
-      <BookTable books={res?.data?.results ?? []} meta={res?.data?.meta} />
+      <SessionProvider>
+        <BookTable books={res?.data?.results ?? []} meta={res?.data?.meta} />
+      </SessionProvider>
     </div>
   );
 };

@@ -1,10 +1,10 @@
 "use client";
 import { DeleteTwoTone, EditTwoTone } from "@ant-design/icons";
-import { Button, Popconfirm, Table, Tag, Spin } from "antd"; // Thêm Spin từ Ant Design
+import { Button, Popconfirm, Table, Tag, Spin, message } from "antd"; // Thêm Spin từ Ant Design
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import BookCreate from "./book.create";
 import { handleDeleteBookAction } from "@/utils/actions/book.action";
 import BookUpdate from "./book.update";
@@ -21,14 +21,42 @@ interface IProps {
 
 const BookTable = (props: IProps) => {
   const { books, meta } = props;
+  const { data: session } = useSession();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
-
+  const [bibleVersions, setBibleVersions] = useState<any[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
   const [dataUpdate, setDataUpdate] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true); // Trạng thái loading
+
+  useEffect(() => {
+    const fetchBibleVersions = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bible-versions`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${session?.user?.accessToken}`,
+            },
+          }
+        );
+        const data = await response.json();
+        setBibleVersions(data?.data?.results || []);
+      } catch (error) {
+        message.error("Có lỗi xảy ra khi lấy danh sách Bible Versions");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (session?.user?.accessToken) {
+      fetchBibleVersions();
+    }
+  }, [session]);
 
   // Giả sử bạn gọi API ở đây, bạn sẽ cập nhật lại loading sau khi nhận được dữ liệu
   useEffect(() => {
@@ -54,6 +82,12 @@ const BookTable = (props: IProps) => {
     {
       title: "Bản Kinh Thánh",
       dataIndex: "bibleVersionId",
+      render: (bibleVersionId: string) => {
+        const bibleVersion = bibleVersions.find(
+          (version) => version._id === bibleVersionId
+        );
+        return bibleVersion ? bibleVersion.name : "Không xác định";
+      },
     },
     {
       title: "Tạo lúc",

@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import NewsTable from "@/components/admin/news/news.table";
 import { sendRequest } from "@/utils/api";
+import { SessionProvider } from "next-auth/react";
 
 interface IProps {
   params: { id: string };
@@ -28,7 +29,9 @@ const ManageNewsPage = async (props: IProps) => {
 
   return (
     <div>
-      <NewsTable news={res?.data?.results ?? []} meta={res?.data?.meta} />
+      <SessionProvider>
+        <NewsTable news={res?.data?.results ?? []} meta={res?.data?.meta} />
+      </SessionProvider>
     </div>
   );
 };

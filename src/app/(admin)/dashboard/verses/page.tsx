@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import BookTable from "@/components/admin/book/book.table";
 import VerseTable from "@/components/admin/verse/verse.table";
 import { sendRequest } from "@/utils/api";
+import { SessionProvider } from "next-auth/react";
 
 interface IProps {
   params: { id: string };
@@ -29,7 +30,9 @@ const ManageBooksPage = async (props: IProps) => {
 
   return (
     <div>
-      <VerseTable verse={res?.data?.results ?? []} meta={res?.data?.meta} />
+      <SessionProvider>
+        <VerseTable verse={res?.data?.results ?? []} meta={res?.data?.meta} />
+      </SessionProvider>
     </div>
   );
 };

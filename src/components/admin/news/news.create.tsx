@@ -42,7 +42,7 @@ const NewsCreate = (props: IProps) => {
     setIsCreateModalOpen(false); // Đóng modal
   };
 
-  // Lấy danh sách Ministry Year
+  // Lấy danh sách Ministry Years và Categories
   useEffect(() => {
     const fetchMinistryYears = async () => {
       if (!session?.user?.accessToken) {

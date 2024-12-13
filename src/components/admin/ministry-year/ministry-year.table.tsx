@@ -1,11 +1,11 @@
 "use client";
 import { DeleteTwoTone, EditTwoTone } from "@ant-design/icons";
-import { Button, Popconfirm, Spin, Table, Tag } from "antd";
+import { Button, message, Popconfirm, Spin, Table, Tag } from "antd";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { handleDeleteCategoryAction } from "@/utils/actions/categoty.action";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import MinistryYearCreate from "./ministry-year.create";
 import MinistryYearUpdate from "./ministry-year.update";
 
@@ -21,14 +21,46 @@ interface IProps {
 
 const MinistryYearTable = (props: IProps) => {
   const { ministryYears, meta } = props;
+  const { data: session } = useSession();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
-
+  const [categories, setCategories] = useState<any[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
   const [dataUpdate, setDataUpdate] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Lấy danh sách Category
+  useEffect(() => {
+    const fetchCategories = async () => {
+      if (!session?.user?.accessToken) {
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${session.user.accessToken}`,
+            },
+          }
+        );
+        const data = await response.json();
+        if (data?.data?.results) {
+          setCategories(data.data.results);
+        } else {
+          message.error("Không thể lấy danh sách Bible Versions");
+        }
+      } catch (error: any) {
+        message.error("Có lỗi xảy ra khi lấy danh sách Bible Versions");
+      }
+    };
+
+    fetchCategories();
+  }, [session]);
 
   useEffect(() => {
     if (ministryYears && ministryYears.length > 0) {
@@ -56,6 +88,10 @@ const MinistryYearTable = (props: IProps) => {
     {
       title: "Danh mục",
       dataIndex: "cateId",
+      render: (cateId: string) => {
+        const category = categories.find((category) => category._id === cateId);
+        return category ? category.name : "Không xác định";
+      },
     },
     {
       title: "Tạo lúc",

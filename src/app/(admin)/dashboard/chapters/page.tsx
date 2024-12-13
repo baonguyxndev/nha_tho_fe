@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import BookTable from "@/components/admin/book/book.table";
 import ChapterTable from "@/components/admin/chapter/chapter.table";
 import { sendRequest } from "@/utils/api";
+import { SessionProvider } from "next-auth/react";
 
 interface IProps {
   params: { id: string };
@@ -29,10 +30,12 @@ const ManageChaptersPage = async (props: IProps) => {
 
   return (
     <div>
-      <ChapterTable
-        chapters={res?.data?.results ?? []}
-        meta={res?.data?.meta}
-      />
+      <SessionProvider>
+        <ChapterTable
+          chapters={res?.data?.results ?? []}
+          meta={res?.data?.meta}
+        />
+      </SessionProvider>
     </div>
   );
 };

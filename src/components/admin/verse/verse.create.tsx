@@ -37,7 +37,7 @@ const VerseCreate = (props: IProps) => {
     setIsCreateModalOpen(false);
   };
 
-  // Lấy sách
+  // Lấy chương
   useEffect(() => {
     const fetchChapters = async () => {
       if (!session?.user?.accessToken) {

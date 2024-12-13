@@ -1,11 +1,11 @@
 "use client";
 import { DeleteTwoTone, EditTwoTone } from "@ant-design/icons";
-import { Button, Popconfirm, Spin, Table, Tag } from "antd";
+import { Button, message, Popconfirm, Spin, Table, Tag } from "antd";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { handleDeleteCategoryAction } from "@/utils/actions/categoty.action";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import VerseCreate from "./verse.create";
 import VerseUpdate from "./verse.update";
 
@@ -21,14 +21,46 @@ interface IProps {
 
 const VerseTable = (props: IProps) => {
   const { verse, meta } = props;
+  const { data: session } = useSession();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
-
+  const [chapters, setChapters] = useState<any[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
   const [dataUpdate, setDataUpdate] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Lấy chương
+  useEffect(() => {
+    const fetchChapters = async () => {
+      if (!session?.user?.accessToken) {
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/chapters`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${session.user.accessToken}`,
+            },
+          }
+        );
+        const data = await response.json();
+        if (data?.data?.results) {
+          setChapters(data.data.results);
+        } else {
+          message.error("Không thể lấy danh sách Bible Versions");
+        }
+      } catch (error: any) {
+        message.error("Có lỗi xảy ra khi lấy danh sách Bible Versions");
+      }
+    };
+
+    fetchChapters();
+  }, [session]);
 
   useEffect(() => {
     if (verse && verse.length > 0) {
@@ -56,6 +88,10 @@ const VerseTable = (props: IProps) => {
     {
       title: "Chương",
       dataIndex: "chapterId",
+      render: (chapterId: string) => {
+        const chapter = chapters.find((chapter) => chapter._id === chapterId);
+        return chapter ? chapter.number : "Không xác định";
+      },
     },
     {
       title: "Tạo lúc",

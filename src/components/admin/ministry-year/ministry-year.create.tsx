@@ -36,7 +36,7 @@ const MinistryYearCreate = (props: IProps) => {
     setIsCreateModalOpen(false);
   };
 
-  // Lấy danh sách Bible Versions
+  // Lấy danh sách Category
   useEffect(() => {
     const fetchCategories = async () => {
       if (!session?.user?.accessToken) {
