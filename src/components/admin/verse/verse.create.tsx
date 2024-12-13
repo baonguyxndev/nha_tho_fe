@@ -11,6 +11,7 @@ import {
   message,
   notification,
   Select,
+  Spin,
 } from "antd";
 import { useSession } from "next-auth/react"; // Nếu sử dụng next-auth để quản lý session
 import { handleCreateVerseAction } from "@/utils/actions/verse.action";
@@ -25,6 +26,7 @@ const VerseCreate = (props: IProps) => {
   const { isCreateModalOpen, setIsCreateModalOpen } = props;
 
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false); // State for loading
   const { data: session } = useSession();
 
   const [chapters, setChapters] = useState<any[]>([]);
@@ -68,15 +70,25 @@ const VerseCreate = (props: IProps) => {
 
   // Hàm xử lý submit form
   const onFinish = async (values: any) => {
-    const res = await handleCreateVerseAction(values);
-    if (res?.data) {
-      handleCloseCreateModal();
-      message.success("Tạo sách thành công");
-    } else {
+    setLoading(true); // Start loading
+    try {
+      const res = await handleCreateVerseAction(values);
+      if (res?.data) {
+        handleCloseCreateModal();
+        message.success("Tạo sách thành công");
+      } else {
+        notification.error({
+          message: "Lỗi tạo sách",
+          description: res?.message,
+        });
+      }
+    } catch (error) {
       notification.error({
-        message: "Lỗi tạo sách",
-        description: res?.message,
+        message: "Đã xảy ra lỗi",
+        description: "Không thể tạo danh mục, vui lòng thử lại.",
       });
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -88,50 +100,54 @@ const VerseCreate = (props: IProps) => {
       onCancel={handleCloseCreateModal}
       maskClosable={false}
     >
-      <Form name="basic" onFinish={onFinish} layout="vertical" form={form}>
-        <Row gutter={[15, 15]}>
-          <Col span={24}>
-            <Form.Item
-              label="Đoạn số"
-              name="number"
-              rules={[{ required: true, message: "Vui lòng nhập số đoạn" }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
+      <Spin spinning={loading}>
+        {" "}
+        {/* Bao bọc nội dung modal với Spin */}
+        <Form name="basic" onFinish={onFinish} layout="vertical" form={form}>
+          <Row gutter={[15, 15]}>
+            <Col span={24}>
+              <Form.Item
+                label="Đoạn số"
+                name="number"
+                rules={[{ required: true, message: "Vui lòng nhập số đoạn" }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
 
-          <Col span={24}>
-            <Form.Item
-              label="Chương"
-              name="chapterId"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng chọn sách",
-                },
-              ]}
-            >
-              <Select placeholder="Chọn Sách">
-                {chapters.map((chapter) => (
-                  <Select.Option key={chapter._id} value={chapter._id}>
-                    {chapter.number}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
+            <Col span={24}>
+              <Form.Item
+                label="Chương"
+                name="chapterId"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng chọn sách",
+                  },
+                ]}
+              >
+                <Select placeholder="Chọn Sách">
+                  {chapters.map((chapter) => (
+                    <Select.Option key={chapter._id} value={chapter._id}>
+                      {chapter.number}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
 
-          <Col span={24}>
-            <Form.Item
-              label="Mô tả"
-              name="desc"
-              rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
-            >
-              <TextArea rows={4} />
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
+            <Col span={24}>
+              <Form.Item
+                label="Mô tả"
+                name="desc"
+                rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
+              >
+                <TextArea rows={4} />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Spin>
     </Modal>
   );
 };

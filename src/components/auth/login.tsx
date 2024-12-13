@@ -9,7 +9,6 @@ import {
   Row,
   Spin,
 } from "antd";
-import { ArrowLeftOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ModalReactive from "./modal.re-active";
@@ -51,7 +50,8 @@ const Login = () => {
 
   return (
     <>
-      {loading ? (
+      {/* Vòng tròn xoay giữa màn hình khi loading */}
+      {loading && (
         <div
           style={{
             position: "fixed",
@@ -62,82 +62,89 @@ const Login = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            backgroundColor: "rgba(255, 255, 255, 0.8)", // Nền mờ
             zIndex: 1000,
           }}
         >
           <Spin size="large" />
         </div>
-      ) : (
-        <Row justify={"center"} style={{ marginTop: "30px" }}>
-          <Col xs={24} md={16} lg={8}>
-            <fieldset
-              style={{
-                padding: "15px",
-                margin: "5px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-              }}
-            >
-              <legend>Đăng Nhập</legend>
-              <Form
-                name="basic"
-                onFinish={onFinish}
-                autoComplete="off"
-                layout="vertical"
-              >
-                <Form.Item
-                  label="Email"
-                  name="email"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng nhập email",
-                    },
-                  ]}
-                >
-                  <Input />
-                </Form.Item>
-
-                <Form.Item
-                  label="Password"
-                  name="password"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng nhập mật khẩu",
-                    },
-                  ]}
-                >
-                  <Input.Password />
-                </Form.Item>
-
-                <Form.Item>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Button type="primary" htmlType="submit">
-                      Login
-                    </Button>
-                    <Button type="link" onClick={() => setChangePassword(true)}>
-                      Quên mật khẩu ?
-                    </Button>
-                  </div>
-                </Form.Item>
-              </Form>
-              <Divider />
-              <div style={{ textAlign: "center" }}>
-                Chưa có tài khoản?{" "}
-                <Link href={"/auth/register"}>Đăng ký tại đây</Link>
-              </div>
-            </fieldset>
-          </Col>
-        </Row>
       )}
+
+      {/* Nội dung Form đăng nhập */}
+      <Row justify={"center"} style={{ marginTop: "30px" }}>
+        <Col xs={24} md={16} lg={8}>
+          <fieldset
+            style={{
+              padding: "15px",
+              margin: "5px",
+              border: "1px solid #ccc",
+              borderRadius: "5px",
+            }}
+          >
+            <legend>Đăng Nhập</legend>
+            <Form
+              name="basic"
+              onFinish={onFinish}
+              autoComplete="off"
+              layout="vertical"
+            >
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng nhập email",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item
+                label="Password"
+                name="password"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng nhập mật khẩu",
+                  },
+                ]}
+              >
+                <Input.Password />
+              </Form.Item>
+
+              <Form.Item>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Button type="primary" htmlType="submit" disabled={loading}>
+                    Login
+                  </Button>
+                  <Button
+                    type="link"
+                    onClick={() => setChangePassword(true)}
+                    disabled={loading}
+                  >
+                    Quên mật khẩu ?
+                  </Button>
+                </div>
+              </Form.Item>
+            </Form>
+            <Divider />
+            <div style={{ textAlign: "center" }}>
+              Chưa có tài khoản?{" "}
+              <Link href={"/auth/register"}>Đăng ký tại đây</Link>
+            </div>
+          </fieldset>
+        </Col>
+      </Row>
+
+      {/* Các modal */}
       <ModalReactive
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}

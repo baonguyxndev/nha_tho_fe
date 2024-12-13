@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import BibleVersionCreate from "./bible-version.create";
 import BibleVersionUpdate from "./bible-version.update";
+import { handleDeleteBibleVersionAction } from "@/utils/actions/bible-version.action";
 
 interface IProps {
   bibleVersion: any;
@@ -63,12 +64,6 @@ const BibleVersionTable = (props: IProps) => {
     {
       title: "Chức năng",
       render: (text: any, record: any, index: any) => {
-        function handleDeleteBibleVersionAction(
-          _id: any
-        ): void | PromiseLike<void> {
-          throw new Error("Function not implemented.");
-        }
-
         return (
           <>
             <EditTwoTone
@@ -81,8 +76,8 @@ const BibleVersionTable = (props: IProps) => {
             />
             <Popconfirm
               placement="leftTop"
-              title={"Xác nhận xóa bản kinh thánh"}
-              description={"Bạn có chắc chắn muốn xóa bản kinh thánh này ?"}
+              title={"Xác nhận xóa sách"}
+              description={"Bạn có chắc chắn muốn xóa sách này ?"}
               onConfirm={async () =>
                 await handleDeleteBibleVersionAction(record?._id)
               }

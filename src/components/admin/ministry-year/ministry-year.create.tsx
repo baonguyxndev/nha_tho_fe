@@ -11,6 +11,7 @@ import {
   message,
   notification,
   Select,
+  Spin,
 } from "antd";
 import { useSession } from "next-auth/react"; // Nếu sử dụng next-auth để quản lý session
 import { handleCreateMinistryYearAction } from "@/utils/actions/ministry-year.action";
@@ -24,6 +25,7 @@ const MinistryYearCreate = (props: IProps) => {
   const { isCreateModalOpen, setIsCreateModalOpen } = props;
 
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false); // State for loading
   const { data: session } = useSession();
 
   const [categories, setCategories] = useState<any[]>([]);
@@ -67,17 +69,27 @@ const MinistryYearCreate = (props: IProps) => {
 
   // Hàm xử lý submit form
   const onFinish = async (values: any) => {
-    console.log("values ", values);
-    const res = await handleCreateMinistryYearAction(values);
-    console.log("res ", res);
-    if (res?.data) {
-      handleCloseCreateModal();
-      message.success("Tạo năm mục vụ thành công");
-    } else {
+    setLoading(true); // Start loading
+    try {
+      console.log("values ", values);
+      const res = await handleCreateMinistryYearAction(values);
+      console.log("res ", res);
+      if (res?.data) {
+        handleCloseCreateModal();
+        message.success("Tạo năm mục vụ thành công");
+      } else {
+        notification.error({
+          message: "Lỗi tạo năm mục vụ",
+          description: res?.message,
+        });
+      }
+    } catch (error) {
       notification.error({
-        message: "Lỗi tạo năm mục vụ",
-        description: res?.message,
+        message: "Đã xảy ra lỗi",
+        description: "Không thể tạo danh mục, vui lòng thử lại.",
       });
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -89,50 +101,54 @@ const MinistryYearCreate = (props: IProps) => {
       onCancel={handleCloseCreateModal}
       maskClosable={false}
     >
-      <Form name="basic" onFinish={onFinish} layout="vertical" form={form}>
-        <Row gutter={[15, 15]}>
-          <Col span={24}>
-            <Form.Item
-              label="Tên"
-              name="name"
-              rules={[{ required: true, message: "Vui lòng nhập tên sách" }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
+      <Spin spinning={loading}>
+        {" "}
+        {/* Bao bọc nội dung modal với Spin */}
+        <Form name="basic" onFinish={onFinish} layout="vertical" form={form}>
+          <Row gutter={[15, 15]}>
+            <Col span={24}>
+              <Form.Item
+                label="Tên"
+                name="name"
+                rules={[{ required: true, message: "Vui lòng nhập tên sách" }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
 
-          <Col span={24}>
-            <Form.Item
-              label="Mô tả"
-              name="desc"
-              rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
+            <Col span={24}>
+              <Form.Item
+                label="Mô tả"
+                name="desc"
+                rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
 
-          <Col span={24}>
-            <Form.Item
-              label="Danh mục"
-              name="cateId"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng chọn danh mục",
-                },
-              ]}
-            >
-              <Select placeholder="Chọn danh mục">
-                {categories.map((cate) => (
-                  <Select.Option key={cate._id} value={cate._id}>
-                    {cate.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
+            <Col span={24}>
+              <Form.Item
+                label="Danh mục"
+                name="cateId"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng chọn danh mục",
+                  },
+                ]}
+              >
+                <Select placeholder="Chọn danh mục">
+                  {categories.map((cate) => (
+                    <Select.Option key={cate._id} value={cate._id}>
+                      {cate.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Spin>
     </Modal>
   );
 };

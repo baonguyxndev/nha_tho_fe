@@ -1,5 +1,15 @@
 import { handleCreateCategoryAction } from "@/utils/actions/categoty.action";
-import { Modal, Input, Form, Row, Col, message, notification } from "antd";
+import {
+  Modal,
+  Input,
+  Form,
+  Row,
+  Col,
+  message,
+  notification,
+  Spin,
+} from "antd";
+import { useState } from "react";
 
 interface IProps {
   isCreateModalOpen: boolean;
@@ -10,6 +20,7 @@ const CategoryCreate = (props: IProps) => {
   const { isCreateModalOpen, setIsCreateModalOpen } = props;
 
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false); // State for loading
 
   const handleCloseCreateModal = () => {
     form.resetFields();
@@ -17,15 +28,25 @@ const CategoryCreate = (props: IProps) => {
   };
 
   const onFinish = async (values: any) => {
-    const res = await handleCreateCategoryAction(values);
-    if (res?.data) {
-      handleCloseCreateModal();
-      message.success("Tạo danh mục thành công");
-    } else {
+    setLoading(true); // Start loading
+    try {
+      const res = await handleCreateCategoryAction(values);
+      if (res?.data) {
+        handleCloseCreateModal();
+        message.success("Tạo danh mục thành công");
+      } else {
+        notification.error({
+          message: "Lỗi tạo danh mục",
+          description: res?.message,
+        });
+      }
+    } catch (error) {
       notification.error({
-        message: "Lỗi tạo danh mục",
-        description: res?.message,
+        message: "Đã xảy ra lỗi",
+        description: "Không thể tạo danh mục, vui lòng thử lại.",
       });
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -37,21 +58,25 @@ const CategoryCreate = (props: IProps) => {
       onCancel={() => handleCloseCreateModal()}
       maskClosable={false}
     >
-      <Form name="basic" onFinish={onFinish} layout="vertical" form={form}>
-        <Row gutter={[15, 15]}>
-          <Col span={24}>
-            <Form.Item
-              label="Tên"
-              name="name"
-              rules={[
-                { required: true, message: "Vui lòng nhập tên danh mục" },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
+      <Spin spinning={loading}>
+        {" "}
+        {/* Bao bọc nội dung modal với Spin */}
+        <Form name="basic" onFinish={onFinish} layout="vertical" form={form}>
+          <Row gutter={[15, 15]}>
+            <Col span={24}>
+              <Form.Item
+                label="Tên"
+                name="name"
+                rules={[
+                  { required: true, message: "Vui lòng nhập tên danh mục" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Spin>
     </Modal>
   );
 };
